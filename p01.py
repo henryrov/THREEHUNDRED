@@ -5,9 +5,6 @@ import icalendar
 import sys
 import os
 
-OK = 0
-ENOENT = 2
-
 class MeetingPattern:
     def __init__(self, start, end, until, location, weekdays):
         self.start_time = start
@@ -32,16 +29,16 @@ class CourseSection:
         print("Course section:", self.name)
         for i in range (0, len(self.meeting_patterns)):
             self.meeting_patterns[i].print_patterns()
-            
+
         print()
 
-        
+
 def parse_section_name(name):
     slice_end = str(name).find(" - ")
     if slice_end < 0:
         print("Error: Section name not recognized")
         return 0;
-    
+
     section_name = name[0:slice_end]
     return section_name
 
@@ -55,9 +52,9 @@ def parse_section_meeting_patterns(mp_string):
         if len(substrings) == 1:
             # Empty line
             continue
-        
+
         date_separator = substrings[0].index("- ") - 1
-        
+
         start_date = datetime.datetime.fromisoformat(
             substrings[0][0:date_separator]
         )
@@ -99,7 +96,7 @@ def parse_section_meeting_patterns(mp_string):
             hour = end_hours, minute = end_minutes,
             tzinfo=zoneinfo.ZoneInfo("America/Vancouver")
         )
-        
+
         location = substrings[3].lstrip().rstrip()
 
         meeting_pattern = MeetingPattern(
@@ -116,27 +113,27 @@ def parse_section_meeting_patterns(mp_string):
 
 def parse_sections(sheet, sections):
     # Data starts in Row 4
-    
+
     for row in range(4, sheet.max_row + 1):
         # Sections names are in column 4 (D)
-        
+
         cell = sheet.cell(row = row, column = 4)
         section_name = parse_section_name(cell.value)
         if section_name == 0:
             continue;
 
         # Meeting patterns are in column 10 (J)
-        
+
         cell = sheet.cell(row = row, column = 10)
         mp_string = cell.value
         meeting_patterns = parse_section_meeting_patterns(mp_string)
-        
+
         section = CourseSection(section_name, meeting_patterns)
         sections.append(section)
 
 def gen_ics(sections):
     cal = icalendar.Calendar()
-    
+
     cal.add('prodid', '-//henry.rov//P01_THREEHUNDRED//EN')
     cal.add('version', '2.0')
 
@@ -155,43 +152,38 @@ def gen_ics(sections):
             event.add("rrule", rrule)
             event.add("location", pattern.location)
             cal.add_component(event)
-            
+
     cal_file = open("out.ics", "wb")
     cal_file.write(cal.to_ical())
     cal_file.close()
-    
-        
-def main():    
+
+
+if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("No file to operate on")
-        return ENOENT
 
     filename = sys.argv[1]
     sheet = openpyxl.load_workbook(filename).active
 
     sections = []
-    
+
     parse_sections(sheet, sections)
 
     for i in range(0, len(sections)):
         sections[i].print_info()
 
     print("Verify the information above.")
-    
+
     while 1:
         print("Create .ics? [Y/n]")
         confirm_string = input()
         if confirm_string == "N" or confirm_string == "n":
             print("Cancelled.")
-            return OK
+            break
         elif (confirm_string == "Y" or confirm_string == "y"
               or confirm_string == "" or confirm_string.isspace()):
             gen_ics(sections)
             print("Done.")
             print("Output written to out.ics.")
-            return OK
         else:
             print("Invalid input. Try again")
-            
-
-main()
