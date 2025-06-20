@@ -6,6 +6,6 @@ How?
 ====
 Navigate to the saved schedule you want to use and click the "Export to Excel" button to the top right of the table. Run the script on the downloaded file:
 ```
-python3 p01.py <filename>
+python3 threehundred.py <filename>
 ```
 Verify the detected course schedule. If it looks right, import the generated "out.ics" file into your calendar client.

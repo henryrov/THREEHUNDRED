@@ -134,7 +134,7 @@ def parse_sections(sheet, sections):
 def gen_ics(sections):
     cal = icalendar.Calendar()
 
-    cal.add('prodid', '-//henry.rov//P01_THREEHUNDRED//EN')
+    cal.add('prodid', '-//henry.rov//THREEHUNDRED//EN')
     cal.add('version', '2.0')
 
     for section in sections:
