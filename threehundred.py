@@ -185,5 +185,6 @@ if __name__ == "__main__":
             gen_ics(sections)
             print("Done.")
             print("Output written to out.ics.")
+            break
         else:
             print("Invalid input. Try again")
