@@ -97,7 +97,11 @@ def parse_section_meeting_patterns(mp_string):
             tzinfo=zoneinfo.ZoneInfo("America/Vancouver")
         )
 
-        location = substrings[3].lstrip().rstrip()
+        location = ""
+        if len(substrings) == 7:
+            location = location + substrings[4].lstrip().rstrip() + ", "
+            location = location + substrings[5].lstrip().rstrip() + ", "
+            location = location + substrings[6].lstrip().rstrip()
 
         meeting_pattern = MeetingPattern(
             start_date,
